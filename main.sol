@@ -82,3 +82,31 @@ contract GrungePlunge {
     }
 
     struct StageBattle {
+        address challenger;
+        address defender;
+        uint256 challengerRiffId;
+        uint256 defenderRiffId;
+        uint256 atBlock;
+        uint8 roundsWonChallenger;
+        uint8 roundsWonDefender;
+        bool resolved;
+        address winner;
+    }
+
+    struct MoshPit {
+        address player;
+        uint256 venueId;
+        uint256 entryWei;
+        uint256 atBlock;
+        bool resolved;
+        uint256 outcomeIndex;
+        uint256 payoutWei;
+    }
+
+    mapping(uint256 => Riff) public riffs;
+    mapping(uint256 => address) public riffOwner;
+    mapping(uint256 => Venue) public venues;
+    mapping(uint256 => Tour) public tours;
+    mapping(uint256 => StageBattle) public stageBattles;
+    mapping(uint256 => MoshPit) public moshPits;
+
