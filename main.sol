@@ -54,3 +54,31 @@ contract GrungePlunge {
         uint8 setlistSlot;
     }
 
+    struct Venue {
+        uint256 entryWei;
+        uint256 totalEntries;
+        uint256 prizePoolWei;
+        uint256 createdAtBlock;
+        bool active;
+        bytes32 nameHash;
+    }
+
+    struct Tour {
+        uint256 startBlock;
+        uint256 endBlock;
+        uint256 prizePoolWei;
+        address leader;
+        uint256 leaderScore;
+        bool finalized;
+    }
+
+    struct PlayerState {
+        uint256 bandNameHash;
+        uint256 backstagePassBlock;
+        uint256 totalScore;
+        uint256 lastRiffMintBlock;
+        uint256 merchTier;
+        uint256 badgeBits;
+    }
+
+    struct StageBattle {
