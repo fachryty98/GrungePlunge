@@ -306,3 +306,31 @@ contract GrungePlunge {
         Riff storage r = riffs[riffId];
         if (r.ampLevel >= AMP_LEVEL_MAX) revert ErrAmpBlown();
         r.ampLevel++;
+    }
+
+    function addToSetlist(uint256 riffId, uint8 slot) external whenNotPaused {
+        if (riffId == 0 || riffId > totalRiffsMinted) revert ErrInvalidRiffId();
+        if (riffOwner[riffId] != msg.sender) revert ErrNotRiffOwner();
+        if (slot >= SETLIST_SLOTS) revert ErrInvalidSlot();
+        Riff storage r = riffs[riffId];
+        if (r.inSetlist) revert ErrSlotOccupied();
+        if (setlistSlotUsed[msg.sender][slot]) {
+            uint256[] storage ids = riffIdsByOwner[msg.sender];
+            for (uint256 i = 0; i < ids.length; i++) {
+                if (riffs[ids[i]].setlistSlot == slot) {
+                    riffs[ids[i]].inSetlist = false;
+                    riffs[ids[i]].setlistSlot = 0;
+                    break;
+                }
+            }
+            setlistSlotUsed[msg.sender][slot] = false;
+        }
+        r.inSetlist = true;
+        r.setlistSlot = slot;
+        setlistSlotUsed[msg.sender][slot] = true;
+        emit SetlistUpdated(msg.sender, riffId, slot, true);
+    }
+
+    function removeFromSetlist(uint256 riffId) external whenNotPaused {
+        if (riffId == 0 || riffId > totalRiffsMinted) revert ErrInvalidRiffId();
+        if (riffOwner[riffId] != msg.sender) revert ErrNotRiffOwner();
