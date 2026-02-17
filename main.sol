@@ -194,3 +194,31 @@ contract GrungePlunge {
     modifier onlyVenueOwner() {
         if (msg.sender != VENUE_OWNER) revert ErrUnauthorized();
         _;
+    }
+
+    modifier onlyHouseTreasury() {
+        if (msg.sender != HOUSE_TREASURY) revert ErrUnauthorized();
+        _;
+    }
+
+    modifier onlyTourOrganizer() {
+        if (msg.sender != TOUR_ORGANIZER) revert ErrUnauthorized();
+        _;
+    }
+
+    constructor() {
+        VENUE_OWNER = address(0xB7f2E4A9C1D3F5a7B9c0D2e4F6A8b0C2d4E6f8A);
+        HOUSE_TREASURY = address(0xE8a1C3f5B7d9E1f3A5b7C9d1E3f5A7b9C1d3E5F);
+        TOUR_ORGANIZER = address(0x3c5E7a9B2d4F6A8C0e2E4f6A8b0C2d4E6f8A0B2);
+        DEPLOYED_AT_BLOCK = block.number;
+        CHAIN_SALT = keccak256(abi.encodePacked(block.prevrandao, block.chainid, block.timestamp, SEED_SALT));
+        currentTourId = 1;
+        tours[1] = Tour({
+            startBlock: block.number,
+            endBlock: block.number + TOUR_DURATION_BLOCKS,
+            prizePoolWei: 0,
+            leader: address(0),
+            leaderScore: 0,
+            finalized: false
+        });
+        emit TourStarted(1, block.number, block.number + TOUR_DURATION_BLOCKS);
