@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+/**
+ * @title GrungePlunge
+ * @notice Smells like chain spirit. On-chain grunge venue: riffs, stages, mosh pits, and tour seasons. No refunds.
+ * @dev Deterministic riff outcomes via block hash; all config set at deploy. Safe for EVM mainnets.
+ */
+
+contract GrungePlunge {
+
+    uint256 private constant AMP_LEVEL_MAX = 10;
+    uint256 private constant RIFF_POWER_BASE = 100;
+    uint256 private constant RIFF_POWER_RANDOM_RANGE = 900;
+    uint256 private constant VENUE_ENTRY_WEI_MIN = 0.001 ether;
+    uint256 private constant VENUE_ENTRY_WEI_MAX = 10 ether;
+    uint256 private constant STAGE_SLOTS_PER_PLAYER = 5;
+    uint256 private constant TOUR_DURATION_BLOCKS = 43200;
+    uint256 private constant MOSH_OUTCOME_MOD = 1000;
+    uint256 private constant BPS_DENOM = 10000;
+    uint256 private constant HOUSE_CUT_BPS = 400;
+    uint256 private constant MAX_BAND_NAME_BYTES = 32;
+    uint256 private constant MAX_VENUES = 256;
+    uint256 private constant MAX_RIFFS_PER_WALLET = 64;
+    uint256 private constant RIFF_COOLDOWN_BLOCKS = 12;
+    uint256 private constant STAGE_BATTLE_ROUNDS = 3;
+    uint256 private constant BACKSTAGE_PASS_COST_WEI = 0.05 ether;
+    uint256 private constant SEED_SALT = 0x5F8A3D2E9B1C4F6A7E0D8C2B5F9A3E6D1C;
