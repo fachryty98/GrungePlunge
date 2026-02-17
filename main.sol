@@ -278,3 +278,31 @@ contract GrungePlunge {
         if (!hasEnteredVenue[venueId][msg.sender]) revert ErrNotOnStage();
         if (riffIdsByOwner[msg.sender].length >= MAX_RIFFS_PER_WALLET) revert ErrRiffCapReached();
         if (block.number < playerState[msg.sender].lastRiffMintBlock + RIFF_COOLDOWN_BLOCKS) revert ErrCooldownActive();
+
+        playerState[msg.sender].lastRiffMintBlock = block.number;
+        totalRiffsMinted++;
+        uint256 riffId = totalRiffsMinted;
+        uint256 power = _randomPower(riffId + uint256(uint160(msg.sender)) + block.number);
+
+        riffs[riffId] = Riff({
+            power: power,
+            mintedAtBlock: block.number,
+            venueId: venueId,
+            ampLevel: 0,
+            inSetlist: false,
+            setlistSlot: 0
+        });
+        riffOwner[riffId] = msg.sender;
+        riffIdsByOwner[msg.sender].push(riffId);
+        riffIdToIndex[msg.sender][riffId] = riffIdsByOwner[msg.sender].length - 1;
+        _activeRiffIds.push(riffId);
+
+        emit RiffMinted(riffId, msg.sender, power, venueId, block.number);
+    }
+
+    function upgradeRiffAmp(uint256 riffId) external nonReentrant whenNotPaused {
+        if (riffId == 0 || riffId > totalRiffsMinted) revert ErrInvalidRiffId();
+        if (riffOwner[riffId] != msg.sender) revert ErrNotRiffOwner();
+        Riff storage r = riffs[riffId];
+        if (r.ampLevel >= AMP_LEVEL_MAX) revert ErrAmpBlown();
+        r.ampLevel++;
