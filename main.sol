@@ -166,3 +166,31 @@ contract GrungePlunge {
     error ErrNotRiffOwner();
     error ErrInvalidBattleId();
     error ErrBattleResolved();
+    error ErrInvalidMoshId();
+    error ErrMoshResolved();
+    error ErrTourNotActive();
+    error ErrTourNotEnded();
+    error ErrUnauthorized();
+    error ErrBandNameTooLong();
+    error ErrInvalidSlot();
+    error ErrSlotOccupied();
+    error ErrRiffNotInSetlist();
+    error ErrWithdrawalZero();
+    error ErrEntryOutOfRange();
+    error ErrNoPendingWithdrawal();
+
+    modifier nonReentrant() {
+        if (_reentrancyGuard != REENTRANCY_GUARD) revert ErrReentrant();
+        _reentrancyGuard = 2;
+        _;
+        _reentrancyGuard = REENTRANCY_GUARD;
+    }
+
+    modifier whenNotPaused() {
+        if (gamePaused) revert ErrGamePaused();
+        _;
+    }
+
+    modifier onlyVenueOwner() {
+        if (msg.sender != VENUE_OWNER) revert ErrUnauthorized();
+        _;
