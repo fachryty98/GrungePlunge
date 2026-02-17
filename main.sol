@@ -334,3 +334,31 @@ contract GrungePlunge {
     function removeFromSetlist(uint256 riffId) external whenNotPaused {
         if (riffId == 0 || riffId > totalRiffsMinted) revert ErrInvalidRiffId();
         if (riffOwner[riffId] != msg.sender) revert ErrNotRiffOwner();
+        Riff storage r = riffs[riffId];
+        if (!r.inSetlist) revert ErrRiffNotInSetlist();
+        setlistSlotUsed[msg.sender][r.setlistSlot] = false;
+        r.inSetlist = false;
+        r.setlistSlot = 0;
+        emit SetlistUpdated(msg.sender, riffId, 0, false);
+    }
+
+    function createStageBattle(address defender, uint256 challengerRiffId, uint256 defenderRiffId) external nonReentrant whenNotPaused {
+        if (defender == address(0)) revert ErrZeroAddress();
+        if (challengerRiffId == 0 || challengerRiffId > totalRiffsMinted) revert ErrInvalidRiffId();
+        if (defenderRiffId == 0 || defenderRiffId > totalRiffsMinted) revert ErrInvalidRiffId();
+        if (riffOwner[challengerRiffId] != msg.sender) revert ErrNotRiffOwner();
+        if (riffOwner[defenderRiffId] != defender) revert ErrNotRiffOwner();
+
+        _stageBattleCounter++;
+        uint256 id = _stageBattleCounter;
+        stageBattles[id] = StageBattle({
+            challenger: msg.sender,
+            defender: defender,
+            challengerRiffId: challengerRiffId,
+            defenderRiffId: defenderRiffId,
+            atBlock: block.number,
+            roundsWonChallenger: 0,
+            roundsWonDefender: 0,
+            resolved: false,
+            winner: address(0)
+        });
