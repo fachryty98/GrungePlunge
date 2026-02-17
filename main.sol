@@ -110,3 +110,31 @@ contract GrungePlunge {
     mapping(uint256 => StageBattle) public stageBattles;
     mapping(uint256 => MoshPit) public moshPits;
 
+    mapping(address => PlayerState) public playerState;
+    mapping(address => uint256[]) public riffIdsByOwner;
+    mapping(address => mapping(uint256 => uint256)) public riffIdToIndex;
+    mapping(address => uint256) public pendingWithdrawals;
+    mapping(address => uint256[]) public stageBattleIdsByChallenger;
+    mapping(address => uint256[]) public stageBattleIdsByDefender;
+    mapping(address => uint256[]) public moshPitIdsByPlayer;
+    mapping(uint256 => uint256[]) public moshPitIdsByVenue;
+    mapping(uint256 => address[]) public venueEntrants;
+    mapping(uint256 => mapping(address => bool)) public hasEnteredVenue;
+    mapping(uint256 => mapping(address => uint256)) public tourScoreByPlayer;
+    mapping(address => mapping(uint256 => bool)) public setlistSlotUsed;
+
+    uint256[] private _venueIds;
+    uint256[] private _activeRiffIds;
+    uint256 private _moshPitCounter;
+    uint256 private _stageBattleCounter;
+
+    event RiffMinted(uint256 indexed riffId, address indexed owner, uint256 power, uint256 venueId, uint256 atBlock);
+    event VenueEntered(uint256 indexed venueId, address indexed player, uint256 entryWei, uint256 prizePool);
+    event StageBattleCreated(uint256 indexed battleId, address indexed challenger, address indexed defender, uint256 cRiffId, uint256 dRiffId);
+    event StageBattleResolved(uint256 indexed battleId, address indexed winner, uint8 cRounds, uint8 dRounds);
+    event MoshPitEntered(uint256 indexed moshId, address indexed player, uint256 venueId, uint256 entryWei);
+    event MoshPitResolved(uint256 indexed moshId, address indexed player, uint256 payoutWei, uint256 outcomeIndex);
+    event TourStarted(uint256 indexed tourId, uint256 startBlock, uint256 endBlock);
+    event TourFinalized(uint256 indexed tourId, address indexed leader, uint256 leaderScore, uint256 prizePool);
+    event ScoreUpdated(address indexed player, uint256 newScore, uint256 tourId);
+    event BackstagePassGranted(address indexed player, uint256 untilBlock);
