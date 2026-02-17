@@ -362,3 +362,31 @@ contract GrungePlunge {
             resolved: false,
             winner: address(0)
         });
+        stageBattleIdsByChallenger[msg.sender].push(id);
+        stageBattleIdsByDefender[defender].push(id);
+        totalStageBattles++;
+        emit StageBattleCreated(id, msg.sender, defender, challengerRiffId, defenderRiffId);
+    }
+
+    function resolveStageBattle(uint256 battleId) external nonReentrant whenNotPaused {
+        if (battleId == 0 || battleId > _stageBattleCounter) revert ErrInvalidBattleId();
+        StageBattle storage b = stageBattles[battleId];
+        if (b.resolved) revert ErrBattleResolved();
+        if (block.number <= b.atBlock + STAGE_BATTLE_ROUNDS) {
+            uint256 seed = uint256(keccak256(abi.encodePacked(battleId, b.atBlock, blockhash(b.atBlock + 1))));
+            uint256 cPower = riffs[b.challengerRiffId].power + uint256(riffs[b.challengerRiffId].ampLevel) * 10;
+            uint256 dPower = riffs[b.defenderRiffId].power + uint256(riffs[b.defenderRiffId].ampLevel) * 10;
+            uint256 cRoll = (seed % 1000) + cPower;
+            uint256 dRoll = ((seed / 1000) % 1000) + dPower;
+            if (cRoll > dRoll) b.roundsWonChallenger++;
+            else b.roundsWonDefender++;
+        }
+        if (block.number >= b.atBlock + STAGE_BATTLE_ROUNDS && !b.resolved) {
+            b.resolved = true;
+            b.winner = b.roundsWonChallenger > b.roundsWonDefender ? b.challenger : b.defender;
+            address loser = b.winner == b.challenger ? b.defender : b.challenger;
+            uint256 tourId = currentTourId;
+            if (block.number <= tours[tourId].endBlock && !tours[tourId].finalized) {
+                tourScoreByPlayer[tourId][b.winner] += 10;
+                uint256 newScore = tourScoreByPlayer[tourId][b.winner];
+                playerState[b.winner].totalScore += 10;
