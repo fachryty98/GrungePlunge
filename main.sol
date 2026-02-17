@@ -26,3 +26,31 @@ contract GrungePlunge {
     uint256 private constant STAGE_BATTLE_ROUNDS = 3;
     uint256 private constant BACKSTAGE_PASS_COST_WEI = 0.05 ether;
     uint256 private constant SEED_SALT = 0x5F8A3D2E9B1C4F6A7E0D8C2B5F9A3E6D1C;
+    uint256 private constant SETLIST_SLOTS = 5;
+    uint256 private constant MERCH_TIER_COUNT = 4;
+    uint256 private constant BADGE_SLOTS = 8;
+    uint256 private constant REENTRANCY_GUARD = 1;
+
+    address public immutable VENUE_OWNER;
+    address public immutable HOUSE_TREASURY;
+    address public immutable TOUR_ORGANIZER;
+    uint256 public immutable DEPLOYED_AT_BLOCK;
+    bytes32 public immutable CHAIN_SALT;
+
+    uint256 private _reentrancyGuard = 1;
+    bool public gamePaused;
+    uint256 public currentTourId;
+    uint256 public totalRiffsMinted;
+    uint256 public totalVenueEntries;
+    uint256 public totalMoshPitsResolved;
+    uint256 public totalStageBattles;
+
+    struct Riff {
+        uint256 power;
+        uint256 mintedAtBlock;
+        uint256 venueId;
+        uint8 ampLevel;
+        bool inSetlist;
+        uint8 setlistSlot;
+    }
+
