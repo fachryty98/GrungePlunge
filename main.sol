@@ -222,3 +222,31 @@ contract GrungePlunge {
             finalized: false
         });
         emit TourStarted(1, block.number, block.number + TOUR_DURATION_BLOCKS);
+    }
+
+    function _safeSend(address to, uint256 amount) private {
+        if (to == address(0) || amount == 0) return;
+        (bool ok,) = to.call{value: amount}("");
+        if (!ok) revert ErrTransferFailed();
+    }
+
+    function _randomPower(uint256 seed) private view returns (uint256) {
+        uint256 r = uint256(keccak256(abi.encodePacked(seed, blockhash(block.number - 1), CHAIN_SALT))) % RIFF_POWER_RANDOM_RANGE;
+        return RIFF_POWER_BASE + r;
+    }
+
+    function createVenue(uint256 entryWei, bytes32 nameHash) external onlyVenueOwner whenNotPaused {
+        if (entryWei < VENUE_ENTRY_WEI_MIN || entryWei > VENUE_ENTRY_WEI_MAX) revert ErrEntryOutOfRange();
+        if (_venueIds.length >= MAX_VENUES) revert ErrVenueFull();
+        uint256 id = _venueIds.length + 1;
+        venues[id] = Venue({
+            entryWei: entryWei,
+            totalEntries: 0,
+            prizePoolWei: 0,
+            createdAtBlock: block.number,
+            active: true,
+            nameHash: nameHash
+        });
+        _venueIds.push(id);
+        emit VenueCreated(id, entryWei, nameHash);
+    }
