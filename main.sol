@@ -250,3 +250,31 @@ contract GrungePlunge {
         _venueIds.push(id);
         emit VenueCreated(id, entryWei, nameHash);
     }
+
+    function deactivateVenue(uint256 venueId) external onlyVenueOwner {
+        if (venueId == 0 || venueId > _venueIds.length) revert ErrInvalidVenueId();
+        venues[venueId].active = false;
+        emit VenueDeactivated(venueId);
+    }
+
+    function enterVenue(uint256 venueId) external payable nonReentrant whenNotPaused {
+        if (venueId == 0 || venueId > _venueIds.length) revert ErrInvalidVenueId();
+        Venue storage v = venues[venueId];
+        if (!v.active) revert ErrVenueInactive();
+        if (msg.value < v.entryWei) revert ErrInsufficientEntry();
+        if (hasEnteredVenue[venueId][msg.sender]) revert ErrAlreadyEntered();
+
+        hasEnteredVenue[venueId][msg.sender] = true;
+        v.totalEntries++;
+        v.prizePoolWei += msg.value;
+        venueEntrants[venueId].push(msg.sender);
+        totalVenueEntries++;
+
+        emit VenueEntered(venueId, msg.sender, msg.value, v.prizePoolWei);
+    }
+
+    function mintRiff(uint256 venueId) external nonReentrant whenNotPaused {
+        if (venueId == 0 || venueId > _venueIds.length) revert ErrInvalidVenueId();
+        if (!hasEnteredVenue[venueId][msg.sender]) revert ErrNotOnStage();
+        if (riffIdsByOwner[msg.sender].length >= MAX_RIFFS_PER_WALLET) revert ErrRiffCapReached();
+        if (block.number < playerState[msg.sender].lastRiffMintBlock + RIFF_COOLDOWN_BLOCKS) revert ErrCooldownActive();
