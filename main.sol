@@ -530,3 +530,31 @@ contract GrungePlunge {
             emit HouseSweep(HOUSE_TREASURY, amt);
         }
     }
+
+    function getRiffIdsByOwner(address owner) external view returns (uint256[] memory) {
+        return riffIdsByOwner[owner];
+    }
+
+    function getVenueEntrants(uint256 venueId) external view returns (address[] memory) {
+        return venueEntrants[venueId];
+    }
+
+    function getStageBattleIdsChallenger(address account) external view returns (uint256[] memory) {
+        return stageBattleIdsByChallenger[account];
+    }
+
+    function getStageBattleIdsDefender(address account) external view returns (uint256[] memory) {
+        return stageBattleIdsByDefender[account];
+    }
+
+    function getMoshPitIdsByPlayer(address account) external view returns (uint256[] memory) {
+        return moshPitIdsByPlayer[account];
+    }
+
+    function getRiffEffectivePower(uint256 riffId) external view returns (uint256) {
+        if (riffId == 0 || riffId > totalRiffsMinted) return 0;
+        Riff storage r = riffs[riffId];
+        return r.power + uint256(r.ampLevel) * 10;
+    }
+
+    function hasBackstagePass(address account) external view returns (bool) {
