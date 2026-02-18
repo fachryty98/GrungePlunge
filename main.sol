@@ -642,3 +642,31 @@ contract GrungePlunge {
         Venue storage v = venues[venueId];
         entryWei = v.entryWei;
         totalEntries = v.totalEntries;
+        prizePoolWei = v.prizePoolWei;
+        createdAtBlock = v.createdAtBlock;
+        active = v.active;
+        nameHash = v.nameHash;
+    }
+
+    function getStageBattleInfo(uint256 battleId) external view returns (
+        address challenger,
+        address defender,
+        uint256 challengerRiffId,
+        uint256 defenderRiffId,
+        uint256 atBlock,
+        uint8 roundsWonChallenger,
+        uint8 roundsWonDefender,
+        bool resolved,
+        address winner
+    ) {
+        if (battleId == 0 || battleId > _stageBattleCounter) revert ErrInvalidBattleId();
+        StageBattle storage b = stageBattles[battleId];
+        challenger = b.challenger;
+        defender = b.defender;
+        challengerRiffId = b.challengerRiffId;
+        defenderRiffId = b.defenderRiffId;
+        atBlock = b.atBlock;
+        roundsWonChallenger = b.roundsWonChallenger;
+        roundsWonDefender = b.roundsWonDefender;
+        resolved = b.resolved;
+        winner = b.winner;
