@@ -586,3 +586,31 @@ contract GrungePlunge {
         prizePoolWei = t.prizePoolWei;
         leader = t.leader;
         leaderScore = t.leaderScore;
+        finalized = t.finalized;
+    }
+
+    function getPlayerTourScore(address account, uint256 tourId) external view returns (uint256) {
+        return tourScoreByPlayer[tourId][account];
+    }
+
+    function getMoshPitIdsByVenue(uint256 venueId) external view returns (uint256[] memory) {
+        return moshPitIdsByVenue[venueId];
+    }
+
+    function getRiffCount() external view returns (uint256) {
+        return totalRiffsMinted;
+    }
+
+    function getVenueCount() external view returns (uint256) {
+        return _venueIds.length;
+    }
+
+    function getStageBattleCount() external view returns (uint256) {
+        return _stageBattleCounter;
+    }
+
+    function getMoshPitCount() external view returns (uint256) {
+        return _moshPitCounter;
+    }
+
+    function getPlayerState(address account) external view returns (
