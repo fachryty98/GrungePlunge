@@ -698,3 +698,31 @@ contract GrungePlunge {
         uint256 venueId,
         uint8 ampLevel,
         bool inSetlist,
+        uint8 setlistSlot,
+        address owner
+    ) {
+        if (riffId == 0 || riffId > totalRiffsMinted) revert ErrInvalidRiffId();
+        Riff storage r = riffs[riffId];
+        power = r.power;
+        mintedAtBlock = r.mintedAtBlock;
+        venueId = r.venueId;
+        ampLevel = r.ampLevel;
+        inSetlist = r.inSetlist;
+        setlistSlot = r.setlistSlot;
+        owner = riffOwner[riffId];
+    }
+
+    function getTourInfo(uint256 tourId) external view returns (
+        uint256 startBlock,
+        uint256 endBlock,
+        uint256 prizePoolWei,
+        address leader,
+        uint256 leaderScore,
+        bool finalized
+    ) {
+        Tour storage t = tours[tourId];
+        startBlock = t.startBlock;
+        endBlock = t.endBlock;
+        prizePoolWei = t.prizePoolWei;
+        leader = t.leader;
+        leaderScore = t.leaderScore;
