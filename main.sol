@@ -810,3 +810,31 @@ contract GrungePlunge {
         for (uint256 i = 0; i < n; i++) {
             uint256 vid = venueIds_[i];
             if (vid != 0 && vid <= _venueIds.length) {
+                Venue storage v = venues[vid];
+                entryWeis[i] = v.entryWei;
+                totalEntries[i] = v.totalEntries;
+                prizePoolWeis[i] = v.prizePoolWei;
+                actives[i] = v.active;
+            }
+        }
+    }
+
+    function getSetlistRiffIds(address account) external view returns (uint256[] memory riffIds, uint8[] memory slots) {
+        uint256[] storage allIds = riffIdsByOwner[account];
+        uint256 count = 0;
+        for (uint256 i = 0; i < allIds.length; i++) {
+            if (riffs[allIds[i]].inSetlist) count++;
+        }
+        riffIds = new uint256[](count);
+        slots = new uint8[](count);
+        uint256 j = 0;
+        for (uint256 i = 0; i < allIds.length; i++) {
+            Riff storage r = riffs[allIds[i]];
+            if (r.inSetlist) {
+                riffIds[j] = allIds[i];
+                slots[j] = r.setlistSlot;
+                j++;
+            }
+        }
+    }
+
