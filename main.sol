@@ -474,3 +474,31 @@ contract GrungePlunge {
         pendingWithdrawals[HOUSE_TREASURY] += houseCut;
         emit MerchTierUpgraded(msg.sender, playerState[msg.sender].merchTier);
     }
+
+    function awardBadge(address player, uint256 badgeSlot) external onlyTourOrganizer {
+        if (badgeSlot >= BADGE_SLOTS) revert ErrInvalidSlot();
+        playerState[player].badgeBits |= (1 << badgeSlot);
+        emit BadgeAwarded(player, badgeSlot);
+    }
+
+    function startNewTour() external onlyTourOrganizer whenNotPaused {
+        uint256 tid = currentTourId;
+        if (block.number <= tours[tid].endBlock) revert ErrTourNotEnded();
+        if (!tours[tid].finalized) {
+            tours[tid].finalized = true;
+            if (tours[tid].leader != address(0)) {
+                uint256 prize = tours[tid].prizePoolWei;
+                if (prize > 0) pendingWithdrawals[tours[tid].leader] += prize;
+                emit TourFinalized(tid, tours[tid].leader, tours[tid].leaderScore, prize);
+            }
+        }
+        currentTourId++;
+        tours[currentTourId] = Tour({
+            startBlock: block.number,
+            endBlock: block.number + TOUR_DURATION_BLOCKS,
+            prizePoolWei: 0,
+            leader: address(0),
+            leaderScore: 0,
+            finalized: false
+        });
+        emit TourStarted(currentTourId, block.number, block.number + TOUR_DURATION_BLOCKS);
