@@ -978,3 +978,28 @@ contract GrungePlunge {
         uint256 end = offset + limit;
         if (end > all.length) end = all.length;
         uint256 n = end - offset;
+        ids = new uint256[](n);
+        for (uint256 i = 0; i < n; i++) {
+            ids[i] = all[offset + i];
+        }
+    }
+
+    function getOwnerRiffCount(address account) external view returns (uint256) {
+        return riffIdsByOwner[account].length;
+    }
+
+    function getVenueEntrantCount(uint256 venueId) external view returns (uint256) {
+        return venueEntrants[venueId].length;
+    }
+
+    function isVenueActive(uint256 venueId) external view returns (bool) {
+        if (venueId == 0 || venueId > _venueIds.length) return false;
+        return venues[venueId].active;
+    }
+
+    function estimateRiffPower(uint256 seed) external view returns (uint256) {
+        return _randomPower(seed);
+    }
+
+    receive() external payable {}
+}
