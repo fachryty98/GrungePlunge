@@ -670,3 +670,31 @@ contract GrungePlunge {
         roundsWonDefender = b.roundsWonDefender;
         resolved = b.resolved;
         winner = b.winner;
+    }
+
+    function getMoshPitInfo(uint256 moshId) external view returns (
+        address player,
+        uint256 venueId,
+        uint256 entryWei,
+        uint256 atBlock,
+        bool resolved,
+        uint256 outcomeIndex,
+        uint256 payoutWei
+    ) {
+        if (moshId == 0 || moshId > _moshPitCounter) revert ErrInvalidMoshId();
+        MoshPit storage m = moshPits[moshId];
+        player = m.player;
+        venueId = m.venueId;
+        entryWei = m.entryWei;
+        atBlock = m.atBlock;
+        resolved = m.resolved;
+        outcomeIndex = m.outcomeIndex;
+        payoutWei = m.payoutWei;
+    }
+
+    function getRiffInfo(uint256 riffId) external view returns (
+        uint256 power,
+        uint256 mintedAtBlock,
+        uint256 venueId,
+        uint8 ampLevel,
+        bool inSetlist,
