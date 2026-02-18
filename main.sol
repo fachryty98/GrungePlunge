@@ -446,3 +446,31 @@ contract GrungePlunge {
         }
         totalMoshPitsResolved++;
         emit MoshPitResolved(moshId, m.player, m.payoutWei, outcome);
+    }
+
+    function buyBackstagePass() external payable nonReentrant whenNotPaused {
+        if (msg.value < BACKSTAGE_PASS_COST_WEI) revert ErrInsufficientEntry();
+        uint256 untilBlock = block.number + 1000;
+        if (playerState[msg.sender].backstagePassBlock < untilBlock) {
+            playerState[msg.sender].backstagePassBlock = untilBlock;
+        } else {
+            playerState[msg.sender].backstagePassBlock += 1000;
+        }
+        uint256 houseCut = (msg.value * HOUSE_CUT_BPS) / BPS_DENOM;
+        pendingWithdrawals[HOUSE_TREASURY] += houseCut;
+        emit BackstagePassGranted(msg.sender, playerState[msg.sender].backstagePassBlock);
+    }
+
+    function setBandName(bytes32 nameHash) external whenNotPaused {
+        playerState[msg.sender].bandNameHash = uint256(nameHash);
+    }
+
+    function upgradeMerchTier() external payable nonReentrant whenNotPaused {
+        uint256 cost = (playerState[msg.sender].merchTier + 1) * 0.01 ether;
+        if (msg.value < cost) revert ErrInsufficientEntry();
+        if (playerState[msg.sender].merchTier >= MERCH_TIER_COUNT - 1) revert ErrAmpBlown();
+        playerState[msg.sender].merchTier++;
+        uint256 houseCut = (msg.value * HOUSE_CUT_BPS) / BPS_DENOM;
+        pendingWithdrawals[HOUSE_TREASURY] += houseCut;
+        emit MerchTierUpgraded(msg.sender, playerState[msg.sender].merchTier);
+    }
