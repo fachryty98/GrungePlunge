@@ -922,3 +922,31 @@ contract GrungePlunge {
 
     function getMoshPitsBatch(uint256[] calldata moshIds) external view returns (
         address[] memory players,
+        uint256[] memory venueIds_,
+        uint256[] memory entryWeis,
+        bool[] memory resolveds,
+        uint256[] memory payoutWeis
+    ) {
+        uint256 n = moshIds.length;
+        players = new address[](n);
+        venueIds_ = new uint256[](n);
+        entryWeis = new uint256[](n);
+        resolveds = new bool[](n);
+        payoutWeis = new uint256[](n);
+        for (uint256 i = 0; i < n; i++) {
+            uint256 id = moshIds[i];
+            if (id != 0 && id <= _moshPitCounter) {
+                MoshPit storage m = moshPits[id];
+                players[i] = m.player;
+                venueIds_[i] = m.venueId;
+                entryWeis[i] = m.entryWei;
+                resolveds[i] = m.resolved;
+                payoutWeis[i] = m.payoutWei;
+            }
+        }
+    }
+
+    function getToursBatch(uint256[] calldata tourIds) external view returns (
+        uint256[] memory startBlocks,
+        uint256[] memory endBlocks,
+        uint256[] memory prizePoolWeis,
