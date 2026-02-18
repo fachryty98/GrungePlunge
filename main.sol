@@ -390,3 +390,31 @@ contract GrungePlunge {
                 tourScoreByPlayer[tourId][b.winner] += 10;
                 uint256 newScore = tourScoreByPlayer[tourId][b.winner];
                 playerState[b.winner].totalScore += 10;
+                if (newScore > tours[tourId].leaderScore) {
+                    tours[tourId].leader = b.winner;
+                    tours[tourId].leaderScore = newScore;
+                }
+                emit ScoreUpdated(b.winner, newScore, tourId);
+            }
+            emit StageBattleResolved(battleId, b.winner, b.roundsWonChallenger, b.roundsWonDefender);
+        }
+    }
+
+    function enterMoshPit(uint256 venueId) external payable nonReentrant whenNotPaused {
+        if (venueId == 0 || venueId > _venueIds.length) revert ErrInvalidVenueId();
+        Venue storage v = venues[venueId];
+        if (!v.active) revert ErrVenueInactive();
+        if (msg.value < v.entryWei) revert ErrInsufficientEntry();
+
+        _moshPitCounter++;
+        uint256 id = _moshPitCounter;
+        moshPits[id] = MoshPit({
+            player: msg.sender,
+            venueId: venueId,
+            entryWei: msg.value,
+            atBlock: block.number,
+            resolved: false,
+            outcomeIndex: 0,
+            payoutWei: 0
+        });
+        moshPitIdsByPlayer[msg.sender].push(id);
