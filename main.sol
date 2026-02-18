@@ -558,3 +558,31 @@ contract GrungePlunge {
     }
 
     function hasBackstagePass(address account) external view returns (bool) {
+        return block.number <= playerState[account].backstagePassBlock;
+    }
+
+    function getTourLeader(uint256 tourId) external view returns (address leader, uint256 score) {
+        leader = tours[tourId].leader;
+        score = tours[tourId].leaderScore;
+    }
+
+    function getVenueIds() external view returns (uint256[] memory) {
+        return _venueIds;
+    }
+
+    function getActiveTourInfo() external view returns (
+        uint256 tourId,
+        uint256 startBlock,
+        uint256 endBlock,
+        uint256 prizePoolWei,
+        address leader,
+        uint256 leaderScore,
+        bool finalized
+    ) {
+        tourId = currentTourId;
+        Tour storage t = tours[currentTourId];
+        startBlock = t.startBlock;
+        endBlock = t.endBlock;
+        prizePoolWei = t.prizePoolWei;
+        leader = t.leader;
+        leaderScore = t.leaderScore;
