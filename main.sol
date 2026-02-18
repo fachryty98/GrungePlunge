@@ -950,3 +950,31 @@ contract GrungePlunge {
         uint256[] memory startBlocks,
         uint256[] memory endBlocks,
         uint256[] memory prizePoolWeis,
+        address[] memory leaders,
+        uint256[] memory leaderScores,
+        bool[] memory finalizes
+    ) {
+        uint256 n = tourIds.length;
+        startBlocks = new uint256[](n);
+        endBlocks = new uint256[](n);
+        prizePoolWeis = new uint256[](n);
+        leaders = new address[](n);
+        leaderScores = new uint256[](n);
+        finalizes = new bool[](n);
+        for (uint256 i = 0; i < n; i++) {
+            Tour storage t = tours[tourIds[i]];
+            startBlocks[i] = t.startBlock;
+            endBlocks[i] = t.endBlock;
+            prizePoolWeis[i] = t.prizePoolWei;
+            leaders[i] = t.leader;
+            leaderScores[i] = t.leaderScore;
+            finalizes[i] = t.finalized;
+        }
+    }
+
+    function getRiffIdsPaginated(address owner, uint256 offset, uint256 limit) external view returns (uint256[] memory ids) {
+        uint256[] storage all = riffIdsByOwner[owner];
+        if (offset >= all.length) return new uint256[](0);
+        uint256 end = offset + limit;
+        if (end > all.length) end = all.length;
+        uint256 n = end - offset;
