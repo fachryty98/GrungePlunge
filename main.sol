@@ -614,3 +614,31 @@ contract GrungePlunge {
     }
 
     function getPlayerState(address account) external view returns (
+        uint256 bandNameHash,
+        uint256 backstagePassBlock,
+        uint256 totalScore,
+        uint256 lastRiffMintBlock,
+        uint256 merchTier,
+        uint256 badgeBits
+    ) {
+        PlayerState storage p = playerState[account];
+        bandNameHash = p.bandNameHash;
+        backstagePassBlock = p.backstagePassBlock;
+        totalScore = p.totalScore;
+        lastRiffMintBlock = p.lastRiffMintBlock;
+        merchTier = p.merchTier;
+        badgeBits = p.badgeBits;
+    }
+
+    function getVenueInfo(uint256 venueId) external view returns (
+        uint256 entryWei,
+        uint256 totalEntries,
+        uint256 prizePoolWei,
+        uint256 createdAtBlock,
+        bool active,
+        bytes32 nameHash
+    ) {
+        if (venueId == 0 || venueId > _venueIds.length) revert ErrInvalidVenueId();
+        Venue storage v = venues[venueId];
+        entryWei = v.entryWei;
+        totalEntries = v.totalEntries;
