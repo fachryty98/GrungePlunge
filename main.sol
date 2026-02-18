@@ -782,3 +782,31 @@ contract GrungePlunge {
         ampLevels = new uint8[](n);
         inSetlists = new bool[](n);
         owners = new address[](n);
+        for (uint256 i = 0; i < n; i++) {
+            uint256 id = riffIds[i];
+            if (id != 0 && id <= totalRiffsMinted) {
+                Riff storage r = riffs[id];
+                powers[i] = r.power;
+                mintedAtBlocks[i] = r.mintedAtBlock;
+                venueIds[i] = r.venueId;
+                ampLevels[i] = r.ampLevel;
+                inSetlists[i] = r.inSetlist;
+                owners[i] = riffOwner[id];
+            }
+        }
+    }
+
+    function getVenuesBatch(uint256[] calldata venueIds_) external view returns (
+        uint256[] memory entryWeis,
+        uint256[] memory totalEntries,
+        uint256[] memory prizePoolWeis,
+        bool[] memory actives
+    ) {
+        uint256 n = venueIds_.length;
+        entryWeis = new uint256[](n);
+        totalEntries = new uint256[](n);
+        prizePoolWeis = new uint256[](n);
+        actives = new bool[](n);
+        for (uint256 i = 0; i < n; i++) {
+            uint256 vid = venueIds_[i];
+            if (vid != 0 && vid <= _venueIds.length) {
