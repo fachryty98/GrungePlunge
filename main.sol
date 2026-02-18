@@ -754,3 +754,31 @@ contract GrungePlunge {
         ampLevelMax = AMP_LEVEL_MAX;
         venueEntryWeiMin = VENUE_ENTRY_WEI_MIN;
         venueEntryWeiMax = VENUE_ENTRY_WEI_MAX;
+        stageSlotsPerPlayer = STAGE_SLOTS_PER_PLAYER;
+        tourDurationBlocks = TOUR_DURATION_BLOCKS;
+        houseCutBps = HOUSE_CUT_BPS;
+        maxRiffsPerWallet = MAX_RIFFS_PER_WALLET;
+        riffCooldownBlocks = RIFF_COOLDOWN_BLOCKS;
+        setlistSlots = SETLIST_SLOTS;
+        backstagePassCostWei = BACKSTAGE_PASS_COST_WEI;
+    }
+
+    function getPendingWithdrawal(address account) external view returns (uint256) {
+        return pendingWithdrawals[account];
+    }
+
+    function getRiffsBatch(uint256[] calldata riffIds) external view returns (
+        uint256[] memory powers,
+        uint256[] memory mintedAtBlocks,
+        uint256[] memory venueIds,
+        uint8[] memory ampLevels,
+        bool[] memory inSetlists,
+        address[] memory owners
+    ) {
+        uint256 n = riffIds.length;
+        powers = new uint256[](n);
+        mintedAtBlocks = new uint256[](n);
+        venueIds = new uint256[](n);
+        ampLevels = new uint8[](n);
+        inSetlists = new bool[](n);
+        owners = new address[](n);
