@@ -502,3 +502,31 @@ contract GrungePlunge {
             finalized: false
         });
         emit TourStarted(currentTourId, block.number, block.number + TOUR_DURATION_BLOCKS);
+    }
+
+    function addTourPrizePool(uint256 tourId) external payable onlyTourOrganizer {
+        if (tourId != currentTourId) revert ErrTourNotActive();
+        tours[tourId].prizePoolWei += msg.value;
+    }
+
+    function togglePause() external onlyVenueOwner {
+        gamePaused = !gamePaused;
+        emit GamePauseToggled(gamePaused);
+    }
+
+    function queueWithdrawal(uint256 amountWei) external nonReentrant {
+        if (amountWei == 0) revert ErrWithdrawalZero();
+        if (pendingWithdrawals[msg.sender] < amountWei) revert ErrNoPendingWithdrawal();
+        pendingWithdrawals[msg.sender] -= amountWei;
+        _safeSend(msg.sender, amountWei);
+        emit WithdrawalCompleted(msg.sender, amountWei);
+    }
+
+    function sweepHouse() external onlyHouseTreasury nonReentrant {
+        uint256 amt = pendingWithdrawals[HOUSE_TREASURY];
+        if (amt > 0) {
+            pendingWithdrawals[HOUSE_TREASURY] = 0;
+            _safeSend(HOUSE_TREASURY, amt);
+            emit HouseSweep(HOUSE_TREASURY, amt);
+        }
+    }
