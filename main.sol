@@ -866,3 +866,31 @@ contract GrungePlunge {
         uint256 deployedAtBlock,
         bytes32 chainSalt
     ) {
+        venueOwner = VENUE_OWNER;
+        houseTreasury = HOUSE_TREASURY;
+        tourOrganizer = TOUR_ORGANIZER;
+        deployedAtBlock = DEPLOYED_AT_BLOCK;
+        chainSalt = CHAIN_SALT;
+    }
+
+    function getGlobalStats() external view returns (
+        uint256 riffCount,
+        uint256 venueCount,
+        uint256 tourId,
+        uint256 stageBattleCount,
+        uint256 moshPitCount,
+        bool paused
+    ) {
+        riffCount = totalRiffsMinted;
+        venueCount = _venueIds.length;
+        tourId = currentTourId;
+        stageBattleCount = _stageBattleCounter;
+        moshPitCount = _moshPitCounter;
+        paused = gamePaused;
+    }
+
+    function getBadgeSlotsUnpacked(address account) external view returns (bool[] memory hasBadge) {
+        hasBadge = new bool[](BADGE_SLOTS);
+        uint256 bits = playerState[account].badgeBits;
+        for (uint256 i = 0; i < BADGE_SLOTS; i++) {
+            hasBadge[i] = (bits & (1 << i)) != 0;
