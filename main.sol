@@ -1003,3 +1003,4 @@ contract GrungePlunge {
 
     receive() external payable {}
 }
+
