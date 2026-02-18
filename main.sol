@@ -894,3 +894,31 @@ contract GrungePlunge {
         uint256 bits = playerState[account].badgeBits;
         for (uint256 i = 0; i < BADGE_SLOTS; i++) {
             hasBadge[i] = (bits & (1 << i)) != 0;
+        }
+    }
+
+    function getStageBattlesBatch(uint256[] calldata battleIds) external view returns (
+        address[] memory challengers,
+        address[] memory defenders,
+        bool[] memory resolveds,
+        address[] memory winners
+    ) {
+        uint256 n = battleIds.length;
+        challengers = new address[](n);
+        defenders = new address[](n);
+        resolveds = new bool[](n);
+        winners = new address[](n);
+        for (uint256 i = 0; i < n; i++) {
+            uint256 id = battleIds[i];
+            if (id != 0 && id <= _stageBattleCounter) {
+                StageBattle storage b = stageBattles[id];
+                challengers[i] = b.challenger;
+                defenders[i] = b.defender;
+                resolveds[i] = b.resolved;
+                winners[i] = b.winner;
+            }
+        }
+    }
+
+    function getMoshPitsBatch(uint256[] calldata moshIds) external view returns (
+        address[] memory players,
