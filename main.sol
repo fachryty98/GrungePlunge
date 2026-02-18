@@ -726,3 +726,31 @@ contract GrungePlunge {
         prizePoolWei = t.prizePoolWei;
         leader = t.leader;
         leaderScore = t.leaderScore;
+        finalized = t.finalized;
+    }
+
+    function computeSetlistPower(address account) external view returns (uint256 total) {
+        uint256[] storage ids = riffIdsByOwner[account];
+        for (uint256 i = 0; i < ids.length; i++) {
+            Riff storage r = riffs[ids[i]];
+            if (r.inSetlist) {
+                total += r.power + uint256(r.ampLevel) * 10;
+            }
+        }
+    }
+
+    function getConstants() external pure returns (
+        uint256 ampLevelMax,
+        uint256 venueEntryWeiMin,
+        uint256 venueEntryWeiMax,
+        uint256 stageSlotsPerPlayer,
+        uint256 tourDurationBlocks,
+        uint256 houseCutBps,
+        uint256 maxRiffsPerWallet,
+        uint256 riffCooldownBlocks,
+        uint256 setlistSlots,
+        uint256 backstagePassCostWei
+    ) {
+        ampLevelMax = AMP_LEVEL_MAX;
+        venueEntryWeiMin = VENUE_ENTRY_WEI_MIN;
+        venueEntryWeiMax = VENUE_ENTRY_WEI_MAX;
