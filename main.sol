@@ -418,3 +418,31 @@ contract GrungePlunge {
             payoutWei: 0
         });
         moshPitIdsByPlayer[msg.sender].push(id);
+        moshPitIdsByVenue[venueId].push(id);
+        totalMoshPitsResolved++;
+        emit MoshPitEntered(id, msg.sender, venueId, msg.value);
+    }
+
+    function resolveMoshPit(uint256 moshId) external nonReentrant whenNotPaused {
+        if (moshId == 0 || moshId > _moshPitCounter) revert ErrInvalidMoshId();
+        MoshPit storage m = moshPits[moshId];
+        if (m.resolved) revert ErrMoshResolved();
+        if (block.number <= m.atBlock) return;
+
+        m.resolved = true;
+        uint256 outcome = uint256(keccak256(abi.encodePacked(moshId, m.atBlock, blockhash(m.atBlock + 1), m.player))) % MOSH_OUTCOME_MOD;
+        m.outcomeIndex = outcome;
+        uint256 houseCut = (m.entryWei * HOUSE_CUT_BPS) / BPS_DENOM;
+        uint256 maxPayout = venues[m.venueId].prizePoolWei;
+        uint256 payout;
+        if (outcome < 400) {
+            payout = (m.entryWei * 2);
+            if (payout > maxPayout) payout = maxPayout;
+            venues[m.venueId].prizePoolWei -= payout;
+            m.payoutWei = payout;
+            pendingWithdrawals[m.player] += payout;
+        } else {
+            m.payoutWei = 0;
+        }
+        totalMoshPitsResolved++;
+        emit MoshPitResolved(moshId, m.player, m.payoutWei, outcome);
