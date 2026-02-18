@@ -838,3 +838,31 @@ contract GrungePlunge {
         }
     }
 
+    function getRiffCooldownRemaining(address account) external view returns (uint256 blocksRemaining) {
+        uint256 last = playerState[account].lastRiffMintBlock;
+        if (last == 0 || block.number >= last + RIFF_COOLDOWN_BLOCKS) return 0;
+        return (last + RIFF_COOLDOWN_BLOCKS) - block.number;
+    }
+
+    function canMintRiff(address account, uint256 venueId) external view returns (bool) {
+        if (venueId == 0 || venueId > _venueIds.length) return false;
+        if (!venues[venueId].active) return false;
+        if (!hasEnteredVenue[venueId][account]) return false;
+        if (riffIdsByOwner[account].length >= MAX_RIFFS_PER_WALLET) return false;
+        if (block.number < playerState[account].lastRiffMintBlock + RIFF_COOLDOWN_BLOCKS) return false;
+        return true;
+    }
+
+    function getTourBlocksRemaining(uint256 tourId) external view returns (uint256) {
+        Tour storage t = tours[tourId];
+        if (block.number >= t.endBlock) return 0;
+        return t.endBlock - block.number;
+    }
+
+    function getImmutableConfig() external view returns (
+        address venueOwner,
+        address houseTreasury,
+        address tourOrganizer,
+        uint256 deployedAtBlock,
+        bytes32 chainSalt
+    ) {
